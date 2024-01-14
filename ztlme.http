@@ -1,0 +1,6 @@
+@ztlme_HostAddress = http://localhost:5272
+
+GET {{ztlme_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
