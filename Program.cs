@@ -16,7 +16,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<DataContext>(options =>
-    options.UseNpgsql(builder.Configuration["ConnectionStrings:DefaultConnection"]));
+    options.UseSqlServer(builder.Configuration["ConnectionStrings:AzureConnection"]));
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 
