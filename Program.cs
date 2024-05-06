@@ -117,7 +117,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
 {
-    app.UseHsts();
+    app.UseHttpsRedirection();
 }
 else
 {

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ztlme")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+34e32b9a60241470ca1480b4df591a61d4e43f15")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2e15cf4885494a4afa0777b2e35333254857e7fc")]
 [assembly: System.Reflection.AssemblyProductAttribute("ztlme")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ztlme")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
