@@ -55,6 +55,15 @@ builder.Services.AddAuthentication(options => {
         // The next to settings must match the Callback URLs in Criipto Verify
         options.CallbackPath = new PathString("/api/Auth/success"); 
         options.SignedOutCallbackPath = new PathString("/api/Auth/signout");
+
+        options.Events = new OpenIdConnectEvents
+        {
+            OnRedirectToIdentityProvider = context =>
+            {
+                context.ProtocolMessage.RedirectUri = context.ProtocolMessage.RedirectUri.Replace("http:", "https:");
+                return Task.CompletedTask;
+            }
+        };
     });
 
 /*
@@ -117,6 +126,10 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
 {
+    app.UseForwardedHeaders(new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
+    });
     app.UseHttpsRedirection();
 }
 else
