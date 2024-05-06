@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/Users/abylikhsanov/RiderProjects/ztlme/ztlme/ztlme.csproj": {}
+    "/home/abyl/Documents/ztlme/ztlme.csproj": {}
   },
   "projects": {
-    "/Users/abylikhsanov/RiderProjects/ztlme/ztlme/ztlme.csproj": {
+    "/home/abyl/Documents/ztlme/ztlme.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/abylikhsanov/RiderProjects/ztlme/ztlme/ztlme.csproj",
+        "projectUniqueName": "/home/abyl/Documents/ztlme/ztlme.csproj",
         "projectName": "ztlme",
-        "projectPath": "/Users/abylikhsanov/RiderProjects/ztlme/ztlme/ztlme.csproj",
-        "packagesPath": "/Users/abylikhsanov/.nuget/packages/",
-        "outputPath": "/Users/abylikhsanov/RiderProjects/ztlme/ztlme/obj/",
+        "projectPath": "/home/abyl/Documents/ztlme/ztlme.csproj",
+        "packagesPath": "/home/abyl/.nuget/packages/",
+        "outputPath": "/home/abyl/Documents/ztlme/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/abylikhsanov/.nuget/NuGet/NuGet.Config"
+          "/home/abyl/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -38,6 +38,14 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "AWSSDK.Extensions.NETCore.Setup": {
+              "target": "Package",
+              "version": "[3.7.300, )"
+            },
+            "AWSSDK.SecretsManager": {
+              "target": "Package",
+              "version": "[3.7.302.60, )"
+            },
             "AutoMapper": {
               "target": "Package",
               "version": "[12.0.1, )"
@@ -62,6 +70,12 @@
               "target": "Package",
               "version": "[8.0.0, )"
             },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
               "version": "[8.0.0, )"
@@ -81,10 +95,6 @@
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.4.0, )"
-            },
-            "System.IdentityModel.Tokens.Jwt": {
-              "target": "Package",
-              "version": "[7.0.3, )"
             }
           },
           "imports": [
@@ -106,7 +116,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.100/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.103/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  ztlme:
+    network_mode: "host"
+    image: "ikhsanov/ztlme-backend:1.0.1"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production

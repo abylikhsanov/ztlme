@@ -16,10 +16,16 @@ public class AuthService : IAuthService
     {
         try
         {
-            return int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdValue = _httpContextAccessor?.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(userIdValue, out var userId))
+            {
+                return userId;
+            }
+            return null;
         }
-        catch (ArgumentNullException exception)
+        catch (Exception exception)
         {
+            Console.WriteLine($"Exception during GetUserId: {exception.Message}");
             return null;
         }
     }

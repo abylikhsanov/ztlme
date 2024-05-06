@@ -1,3 +1,6 @@
 .azure
 bin/
 obj/
+.idea
+appsettings.Production.json
+publish/

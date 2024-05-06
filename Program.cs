@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.OpenApi.Models;
 using ztlme.Data;
@@ -9,6 +8,9 @@ using ztlme.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.AddConsole(options => {
+    options.LogToStandardErrorThreshold = LogLevel.Trace;
+});
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -16,7 +18,18 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<DataContext>(options =>
-    options.UseSqlServer(builder.Configuration["ConnectionStrings:AzureConnection"]));
+{
+    if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+    {
+        var m = Regex.Match(Environment.GetEnvironmentVariable("DATABASE_URL")!, @"postgres://(.*):(.*)@(.*):(.*)/(.*)");
+        options.UseNpgsql($"Server={m.Groups[3]};Port={m.Groups[4]};User Id={m.Groups[1]};Password={m.Groups[2]};Database={m.Groups[5]};sslmode=Prefer;Trust Server Certificate=true");
+    }
+    else
+    {
+        options.UseNpgsql(builder.Configuration.GetConnectionString("ztlme_db"));
+    }
+    
+});
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 
@@ -102,16 +115,20 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+{
+    app.UseHsts();
+}
+else
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.UseHttpsRedirection();
 
 app.Run();
