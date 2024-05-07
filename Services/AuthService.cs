@@ -8,32 +8,12 @@ namespace ztlme.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly IConfiguration _configuration;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly DataContext _dataContext;
-    
-    private int? GetUserId()
-    {
-        try
-        {
-            var userIdValue = _httpContextAccessor?.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (int.TryParse(userIdValue, out var userId))
-            {
-                return userId;
-            }
-            return null;
-        }
-        catch (Exception exception)
-        {
-            Console.WriteLine($"Exception during GetUserId: {exception.Message}");
-            return null;
-        }
-    }
     
     public AuthService(IConfiguration configuration,
         IHttpContextAccessor contextAccessor, DataContext dataContext)
     {
-        _configuration = configuration;
         _httpContextAccessor = contextAccessor;
         _dataContext = dataContext;
     }
@@ -70,6 +50,7 @@ public class AuthService : IAuthService
                 await _dataContext.SaveChangesAsync();
             }
 
+            response.Success = true;
             response.Data = "Logged in";
 
         }

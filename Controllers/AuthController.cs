@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ztlme.Models;
 using ztlme.Services;
 
 namespace ztlme.Controllers;
@@ -29,7 +27,7 @@ public class AuthController : ControllerBase
     [HttpGet("success")]
     public async Task<ActionResult<string>> Get()
     {
-        Console.WriteLine("AAAAA");
+        Console.WriteLine("success");
         return Ok(await _authService.AuthSuccessBankId());
     }
     

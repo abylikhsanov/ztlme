@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
+using Criipto.Signatures;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.OpenApi.Models;
 using ztlme.Data;
@@ -17,6 +18,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddLogging();
 builder.Services.AddDbContext<DataContext>(options =>
 {
     if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
@@ -31,9 +33,7 @@ builder.Services.AddDbContext<DataContext>(options =>
     
 });
 
-builder.Services.AddScoped<IAuthService, AuthService>();
-
-//Criipto
+//Criipto Auth
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
     options.CheckConsentNeeded = context => true;
@@ -46,9 +46,19 @@ builder.Services.AddAuthentication(options => {
     })
     .AddCookie()
     .AddOpenIdConnect(options => {
-        options.ClientId = builder.Configuration["Criipto:ClientId"];
-        options.ClientSecret = builder.Configuration["Criipto:ClientSecret"];
-        options.Authority = $"https://{builder.Configuration["Criipto:Domain"]}/";
+
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+        {
+            options.ClientId = Environment.GetEnvironmentVariable("CRIIPTO_AUTH_CLIENT_ID");
+            options.ClientSecret = Environment.GetEnvironmentVariable("CRIIPTO_AUTH_CLIENT_SECRET");
+            options.Authority = $"https://{Environment.GetEnvironmentVariable("CRIIPTO_AUTH_DOMAIN")}/";
+        }
+        else
+        {
+            options.ClientId = builder.Configuration["CriiptoAuth:ClientId"];
+            options.ClientSecret = builder.Configuration["CriiptoAuth:Secret"];
+            options.Authority = $"https://{builder.Configuration["CriiptoAuth:Domain"]}/";
+        }
         options.ResponseType = "code";
         options.SkipUnrecognizedRequests = true;
 
@@ -66,29 +76,26 @@ builder.Services.AddAuthentication(options => {
         };
     });
 
-/*
-builder.Services.AddAuthentication(options =>
+// Criipto signature
+builder.Services.AddSingleton<CriiptoSignaturesClient>(serviceProvider =>
+{
+    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+    if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
     {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
+        return new CriiptoSignaturesClient(Environment.GetEnvironmentVariable("CRIIPTO_CLIENT_ID")!,
+            Environment.GetEnvironmentVariable("CRIIPTO_CLIENT_SECRET")!);
+    }
+    else
     {
-        options.TokenValidationParameters = new TokenValidationParameters()
-        {
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
-        };
-    });
+        string clientId = builder.Configuration["Criipto:ClientId"]!;
+        string clientSecret = builder.Configuration["Criipto:ClientSecret"]!;
+        return new CriiptoSignaturesClient(clientId, clientSecret);
+    }
+});
 
-builder.Services.AddSingleton<IAuthenticationService>(provider => 
-    new AuthenticationService(builder.Configuration["Signicat:ClientId"], 
-        builder.Configuration["Signicat:Secret"], new List<OAuthScope>() { OAuthScope.Identify }));
-
-*/
+// Register services
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ISignatureService, SignatureService>();
 
 // Swagger
 builder.Services.AddSwaggerGen(c =>

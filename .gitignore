@@ -3,4 +3,5 @@ bin/
 obj/
 .idea
 appsettings.Production.json
+appsettings.Development.json
 publish/
