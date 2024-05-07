@@ -51,7 +51,7 @@ public class SignatureController : ControllerBase
     }
 
     [Authorize]
-    [HttpPost("sign/blob")]
+    [HttpGet("sign")]
     public async Task<ActionResult<ServiceResponse<string>>> SignDocument()
     {
         try
@@ -60,7 +60,7 @@ public class SignatureController : ControllerBase
             var response = await _signatureService.SignDocument();
             if (response.Success)
             {
-                return Ok(response);
+                return Redirect(response.Data!);
             }
 
             return StatusCode(500, "Internal server error: " + response.Message);

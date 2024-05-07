@@ -32,6 +32,15 @@ builder.Services.AddDbContext<DataContext>(options =>
     }
     
 });
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("MyCorsPolicy", builder =>
+        builder.WithOrigins("http://localhost:3000")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials()); // Important for cookies to be allowed
+});
+
 
 //Criipto Auth
 builder.Services.Configure<CookiePolicyOptions>(options =>
@@ -146,6 +155,7 @@ else
     app.UseDeveloperExceptionPage();
 }
 
+app.UseCors("MyCorsPolicy");
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

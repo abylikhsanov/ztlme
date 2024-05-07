@@ -18,6 +18,30 @@ public class AuthService : IAuthService
         _dataContext = dataContext;
     }
 
+    public ServiceResponse<bool> CheckAuth()
+    {
+        var response = new ServiceResponse<bool>();
+        response.Success = false;
+        response.Data = false;
+        
+        try
+        {
+            var user = _httpContextAccessor.HttpContext?.User;
+            if (user == null)
+            {
+                return response;
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return response;
+        }
+
+        response.Success = true;
+        response.Data = true;
+        return response;
+    }
     
     public async Task<ServiceResponse<string>> AuthSuccessBankId()
     {

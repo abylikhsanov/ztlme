@@ -10,9 +10,18 @@ namespace ztlme.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
-    public AuthController(IAuthService authService)
+    private readonly IConfiguration _configuration;
+    public AuthController(IAuthService authService, IConfiguration configuration)
     {
         _authService = authService;
+        _configuration = configuration;
+    }
+
+    [HttpGet("isAuth")]
+    public ActionResult<bool> GetIsAuth()
+    {
+        var response = _authService.CheckAuth();
+        return Ok(response);
     }
 
     [HttpGet("bankid")]
@@ -27,7 +36,16 @@ public class AuthController : ControllerBase
     [HttpGet("success")]
     public async Task<ActionResult<string>> Get()
     {
-        Console.WriteLine("success");
+        Console.WriteLine("success, redirecting");
+        var response = await _authService.AuthSuccessBankId();
+        if (response.Success)
+        {
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+            {
+                return Redirect($"{Environment.GetEnvironmentVariable("FRONTEND_URI")!}/{Environment.GetEnvironmentVariable("FRONTEND_URI_AUTH_SUCCESS")!}");
+            }
+            return Redirect(_configuration["Frontend:AuthSuccessURI"]!);
+        }
         return Ok(await _authService.AuthSuccessBankId());
     }
     
