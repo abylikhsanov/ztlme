@@ -34,8 +34,19 @@ builder.Services.AddDbContext<DataContext>(options =>
 });
 builder.Services.AddCors(options =>
 {
+    string? frontendUrl = builder.Configuration["Frontend:RootURI"];
+    if (frontendUrl == null)
+    {
+        frontendUrl = "http://localhost:3000";
+    }
+    if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+    {
+        frontendUrl = Environment.GetEnvironmentVariable("FRONTEND_URI")!;
+    }
+    
+
     options.AddPolicy("MyCorsPolicy", builder =>
-        builder.WithOrigins("http://localhost:3000")
+        builder.WithOrigins(frontendUrl)
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials()); // Important for cookies to be allowed
