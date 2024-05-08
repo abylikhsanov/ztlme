@@ -6,4 +6,5 @@ public interface IAuthService
 {
     ServiceResponse<bool> CheckAuth();
     Task<ServiceResponse<string>> AuthSuccessBankId();
+    Task<ServiceResponse<PersonSignUpResponse>> CheckIfCanBeSignedUp(PersonSignUp person);
 }

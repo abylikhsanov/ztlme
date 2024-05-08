@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using ztlme.Services;
+using ztlme.Models;
 
 namespace ztlme.Controllers;
 
@@ -17,6 +19,7 @@ public class AuthController : ControllerBase
         _configuration = configuration;
     }
 
+    // Not used.
     [HttpGet("isAuth")]
     public ActionResult<bool> GetIsAuth()
     {
@@ -24,6 +27,7 @@ public class AuthController : ControllerBase
         return Ok(response);
     }
 
+    // Do not use, expensive
     [HttpGet("bankid")]
     public IActionResult Authenticate()
     {
@@ -33,6 +37,7 @@ public class AuthController : ControllerBase
         }, OpenIdConnectDefaults.AuthenticationScheme);
     }
     
+    // Do not use, expensive, requires bankid
     [HttpGet("success")]
     public async Task<ActionResult<string>> Get()
     {
@@ -48,5 +53,20 @@ public class AuthController : ControllerBase
         }
         return Ok(await _authService.AuthSuccessBankId());
     }
+
+    // If empty body, return false.
+    // Before calling credit check API, check the DB
+    // if (person in DB) -> If (CreditScoreOK) -> true else false
+    [HttpPost("signup")]
+    public async Task<ActionResult<bool>> SignUp([FromBody] PersonSignUp person)
+    {
+        // Check for credit and is lower than we need, reject (return false).
+        // If ok, add to the database
+        Console.WriteLine("signup");
+        var response = await _authService.CheckIfCanBeSignedUp(person);
+        return Ok(response);
+    }
+    
+    
     
 }

@@ -21,7 +21,6 @@ public class SignatureController : ControllerBase
     [HttpPost("success")]
     public async Task<ActionResult<bool>> GetSuccess([FromBody] JsonDocument? data)
     {
-
         if (data == null)
         {
             return Ok();
@@ -46,7 +45,7 @@ public class SignatureController : ControllerBase
 
         var signatureOrderId = signatureOrderIdElement.ToString();
      
-        var response = await _signatureService.SignatureSuccess(eventToken, signatureOrderId);
+        var response = await _signatureService.UnAuthSignatureSuccess(eventToken, signatureOrderId);
         return Ok(response.Message);
     }
 
@@ -57,7 +56,7 @@ public class SignatureController : ControllerBase
         try
         {
             // Use controller to sign the document and upload to the database
-            var response = await _signatureService.SignDocument();
+            var response = await _signatureService.UnAuthSignDocument();
             if (response.Success)
             {
                 return Redirect(response.Data!);

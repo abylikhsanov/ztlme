@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.IdentityModel.Tokens;
 using ztlme.Data;
 using ztlme.Models;
 
@@ -84,6 +84,53 @@ public class AuthService : IAuthService
             response.Success = false;
             return response;
         }
+        return response;
+    }
+
+    public async Task<ServiceResponse<PersonSignUpResponse>> CheckIfCanBeSignedUp(PersonSignUp person)
+    {
+        var response = new ServiceResponse<PersonSignUpResponse>();
+        var personSignUp = new PersonSignUpResponse();
+        response.Success = true;
+        response.Data = personSignUp;
+        
+        // Before checking credit score (it costs money, check if we have the person in the database
+        var userDb = await _dataContext.Users.FirstOrDefaultAsync(user => user.UserName == person.PersonalNumber);
+        if (userDb != null)
+        {
+            if (!userDb.CreditScoreOk)
+            {
+                return response;
+            }
+
+            if (!userDb.SignedBlob.IsNullOrEmpty())
+            {
+                Console.WriteLine("Ok");
+                response.Data.CanBeSignedUp = true;
+                response.Data.DocumentSigned = true;
+                return response;
+            }
+
+            response.Data.CanBeSignedUp = true;
+            return response;
+        }
+        
+        // Perform credit score, new user.
+        var newUser = new User
+        {
+            UserName = person.PersonalNumber
+        };
+        
+        // For testing purposes, suppose only this credit check is okay
+        if (person.PersonalNumber == "30070721151")
+        {
+            newUser.CreditScoreOk = true;
+            response.Data.CanBeSignedUp = true;
+        }
+
+        _dataContext.Users.Add(newUser);
+        await _dataContext.SaveChangesAsync();
+        
         return response;
     }
     
