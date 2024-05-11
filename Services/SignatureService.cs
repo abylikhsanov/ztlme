@@ -9,7 +9,7 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace ztlme.Services;
 
-public class SignatureService : ISignatureService
+internal class SignatureService : ISignatureService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly DataContext _dataContext;
@@ -19,8 +19,8 @@ public class SignatureService : ISignatureService
 
     private List<DocumentInput> CreateDocument(byte[] file, string userId)
     {
-        return new List<DocumentInput>
-        {
+        return
+        [
             new DocumentInput
             {
                 pdf = new PadesDocumentInput
@@ -30,10 +30,29 @@ public class SignatureService : ISignatureService
                     storageMode = DocumentStorageMode.Temporary
                 }
             }
-        };
+        ];
     }
 
-    private async Task<string> GetSignLink(List<DocumentInput> documents)
+    private List<EvidenceProviderInput> CreateEvidence()
+    {
+        return
+        [
+            new EvidenceProviderInput
+            {
+                criiptoVerify = new CriiptoVerifyProviderInput()
+                {
+                    acrValues = new List<string>()
+                    {
+                        "urn:grn:authn:no:bankid", "urn:grn:authn:no:bankid:substantial",
+                        "urn:grn:authn:no:vipps"
+                    },
+                    alwaysRedirect = true
+                }
+            }
+        ];
+    }
+
+    private async Task<string> GetSignLink(List<DocumentInput> documents, List<EvidenceProviderInput> evidenceProviderInputs)
     {
         var absoluteUri = _configuration["BackendURI"] + "/api/signature/success";
         if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
@@ -45,6 +64,7 @@ public class SignatureService : ISignatureService
         {
             title = "ztl.me fullmakt",
             documents = documents,
+            evidenceProviders = evidenceProviderInputs,
             webhook = new CreateSignatureOrderWebhookInput()
             {
                 url = absoluteUri,
@@ -97,9 +117,10 @@ public class SignatureService : ISignatureService
             _logger.LogInformation($"userId is: {userId}");
 
             var documents = CreateDocument(fileData, userId!);
-            var link = await GetSignLink(documents);
+            var evidenceProviders = CreateEvidence();
+            var link = await GetSignLink(documents, evidenceProviders);
             _logger.LogInformation($"Have succesfully obtained with data: {link}");
-            response.Data = await GetSignLink(documents);
+            response.Data = link;
             response.Message = "Successfully obtained signature link";
             response.Success = true;
             return response;
@@ -200,9 +221,10 @@ public class SignatureService : ISignatureService
             _logger.LogInformation($"userId is: {userId}");
 
             var documents = CreateDocument(fileData, userId!);
-            var link = await GetSignLink(documents);
+            var evidenceProviders = CreateEvidence();
+            var link = await GetSignLink(documents, evidenceProviders);
             _logger.LogInformation($"Have succesfully obtained with data: {link}");
-            response.Data = await GetSignLink(documents);
+            response.Data = link;
             response.Message = "Successfully obtained signature link";
             response.Success = true;
             return response;

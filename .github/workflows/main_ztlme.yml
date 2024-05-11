@@ -34,33 +34,23 @@ jobs:
           name: .net-app
           path: ${{env.DOTNET_ROOT}}/myapp
 
-  deploy:
+  test:
     runs-on: ubuntu-latest
     needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    permissions:
-      id-token: write #This is required for requesting the JWT
-
     steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '8.x'
+          include-prerelease: true
+
       - name: Download artifact from build job
         uses: actions/download-artifact@v3
         with:
           name: .net-app
-      
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_C3939D28F46B4B698B5A9CA2E1C96B74 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_BB995C171D2943D9A48F85E1D0133DB6 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_26BE17CD19A543C28ECC1C9BFAB828CB }}
 
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'ztlme'
-          slot-name: 'Production'
-          package: .
+      - name: Test with dotnet
+        run: cd ztlme.IntegrationTests && dotnet test --no-build --configuration Release ${{env.DOTNET_ROOT}}/myapp
           

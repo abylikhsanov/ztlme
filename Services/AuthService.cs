@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ztlme.Data;
+using ztlme.Dtos;
 using ztlme.Models;
 
 namespace ztlme.Services;
@@ -10,12 +11,15 @@ public class AuthService : IAuthService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly DataContext _dataContext;
+    private readonly ILogger<AuthService> _logger;
     
     public AuthService(IConfiguration configuration,
-        IHttpContextAccessor contextAccessor, DataContext dataContext)
+        IHttpContextAccessor contextAccessor, DataContext dataContext,
+        ILogger<AuthService> logger)
     {
         _httpContextAccessor = contextAccessor;
         _dataContext = dataContext;
+        _logger = logger;
     }
 
     public ServiceResponse<bool> CheckAuth()
@@ -87,17 +91,19 @@ public class AuthService : IAuthService
         return response;
     }
 
-    public async Task<ServiceResponse<PersonSignUpResponse>> CheckIfCanBeSignedUp(PersonSignUp person)
+    public async Task<ServiceResponse<SignupUserResDto>> CheckIfCanBeSignedUp(string personalNumber)
     {
-        var response = new ServiceResponse<PersonSignUpResponse>();
-        var personSignUp = new PersonSignUpResponse();
+        _logger.LogInformation("Je");
+        var response = new ServiceResponse<SignupUserResDto>();
+        var personSignUp = new SignupUserResDto();
         response.Success = true;
         response.Data = personSignUp;
         
         // Before checking credit score (it costs money, check if we have the person in the database
-        var userDb = await _dataContext.Users.FirstOrDefaultAsync(user => user.UserName == person.PersonalNumber);
+        var userDb = await _dataContext.Users.FirstOrDefaultAsync(user => user.UserName == personalNumber);
         if (userDb != null)
         {
+            response.Data.CreditScoreApiCalled = false;
             if (!userDb.CreditScoreOk)
             {
                 return response;
@@ -118,11 +124,11 @@ public class AuthService : IAuthService
         // Perform credit score, new user.
         var newUser = new User
         {
-            UserName = person.PersonalNumber
+            UserName = personalNumber
         };
         
         // For testing purposes, suppose only this credit check is okay
-        if (person.PersonalNumber == "30070721151")
+        if (personalNumber == "30070721151")
         {
             newUser.CreditScoreOk = true;
             response.Data.CanBeSignedUp = true;
