@@ -37,7 +37,7 @@ public class RegisterUserEndpoint : EndpointWithoutRequest
         };
 
         Console.WriteLine("Initiating Challenge");
-        await HttpContext.ChallengeAsync("Criipto", properties);
+        await HttpContext.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, properties);
 
         // Optionally set status code and complete response
         await HttpContext.Response.CompleteAsync();

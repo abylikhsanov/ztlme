@@ -93,52 +93,12 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
         };
     });*/
 
-builder.Services.AddAuthentication(config =>
-    {
-        config.DefaultAuthenticateScheme = "AuthorizationCodeClientAppCookie";
-        config.DefaultSignInScheme = "AuthorizationCodeClientAppCookie";
-        config.DefaultChallengeScheme = "Signicat";
-    })
-    .AddCookie("AuthorizationCodeClientAppCookie")
-    .AddOpenIdConnect("Signicat", config =>
-    {
-        config.Events.OnAuthorizationCodeReceived = RedeemAuthorizationCodeAsync;
-
-        config.Authority = "https://ztlme.sandbox.signicat.com/auth/open";
-        
-        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
-        {
-            config.ClientId = Environment.GetEnvironmentVariable("SIGNICAT_AUTH_CLIENT_ID");
-            config.ClientSecret = Environment.GetEnvironmentVariable("SIGNICAT_AUTH_CLIENT_SECRET");
-        }
-        else
-        {
-            config.ClientId = builder.Configuration["SignicatAuth:ClientId"];
-            config.ClientSecret = builder.Configuration["SignicatAuth:Secret"];
-        }
-        
-        config.CallbackPath = "/api/auth/success";
-
-        config.UsePkce = true;
-
-        config.ResponseType = "code";
-
-        config.Scope.Add("openid");
-        config.Scope.Add("profile");
-
-        config.GetClaimsFromUserInfoEndpoint = true;
-
-        config.SaveTokens = true;
-        
-        
-    });
-
 builder.Services.AddAuthentication(options => {
         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
     })
     .AddCookie()
-    .AddOpenIdConnect("Criipto", options => {
+    .AddOpenIdConnect(options => {
 
         if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
         {
