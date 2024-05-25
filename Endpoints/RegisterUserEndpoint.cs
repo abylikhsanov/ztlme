@@ -9,15 +9,13 @@ namespace ztlme.Endpoints;
 public class RegisterUserEndpoint : EndpointWithoutRequest
 {
     private readonly IAuthService _authService;
-    private readonly IAuthenticationService _authenticationService;
     private readonly string _frontendAppUrl;
     private readonly string _backendUrl;
     
-    public RegisterUserEndpoint(IAuthService authService, IAuthenticationService authenticationService, 
+    public RegisterUserEndpoint(IAuthService authService, 
         IConfiguration configuration)
     {
         _authService = authService;
-        _authenticationService = authenticationService;
         _frontendAppUrl = configuration["FrontendURI"]!;
         _backendUrl = configuration["BackendURI"]!;
     }
