@@ -29,7 +29,6 @@ public static class EntityExtensions
             UserName = landingNoCheckDto.PersonalNumber,
             FirstName = landingNoCheckDto.FirstName,
             LastName = landingNoCheckDto.LastName,
-            Email = landingNoCheckDto.Email
         };
     }
 }
