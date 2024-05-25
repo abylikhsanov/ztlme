@@ -61,7 +61,7 @@ builder.Services.AddCors(options =>
 });
 
 // Add FastEndpoints
-builder.Services.AddFastEndpoints();
+//builder.Services.AddFastEndpoints();
 
 
 //Criipto Auth
@@ -119,14 +119,7 @@ builder.Services.AddAuthentication(options => {
         options.CallbackPath = new PathString("/api/Auth/success"); 
         options.SignedOutCallbackPath = new PathString("/api/auth/signout");
 
-        options.Events = new OpenIdConnectEvents
-        {
-            OnRedirectToIdentityProvider = context =>
-            {
-                context.ProtocolMessage.RedirectUri = context.ProtocolMessage.RedirectUri.Replace("http:", "https:");
-                return Task.CompletedTask;
-            }
-        };
+        
     });
 
 // Criipto signature
@@ -202,7 +195,7 @@ app.UseCors("MyCorsPolicy");
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseFastEndpoints();
+//app.UseFastEndpoints();
 app.MapControllers();
 
 app.Run();

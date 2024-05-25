@@ -34,12 +34,12 @@ public class AuthController : ControllerBase
     {
         return Challenge(new AuthenticationProperties
         {
-            RedirectUri = "/api/Auth/success"
+            // RedirectUri = "/api/Auth/success"
         }, OpenIdConnectDefaults.AuthenticationScheme);
     }
     
     // Do not use, expensive, requires bankid
-    [HttpPost("success")]
+    [HttpGet("success")]
     public async Task<ActionResult<string>> Get()
     {
         Console.WriteLine("success, redirecting");

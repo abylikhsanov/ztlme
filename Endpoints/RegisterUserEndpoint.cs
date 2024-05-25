@@ -30,10 +30,11 @@ public class RegisterUserEndpoint : EndpointWithoutRequest
     {
         var request = HttpContext.Request;
         var redirectUri = $"{request.Scheme}://{request.Host}/api/auth/success";
+        Console.WriteLine($"URI: {redirectUri}");
 
         var properties = new AuthenticationProperties
         {
-            RedirectUri = "/api/auth/success" // Ensure this is an absolute URI
+            RedirectUri = redirectUri // Ensure this is an absolute URI
         };
 
         Console.WriteLine("Initiating Challenge");
