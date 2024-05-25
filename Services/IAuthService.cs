@@ -6,6 +6,8 @@ namespace ztlme.Services;
 public interface IAuthService
 {
     ServiceResponse<bool> CheckAuth();
-    Task<ServiceResponse<string>> AuthSuccessBankId();
-    Task<ServiceResponse<SignupUserResDto>> CheckIfCanBeSignedUp(string personalNumber);
+    Task<ServiceResponse<string>> RegisterCriiptoUserSuccess();
+    Task<ServiceResponse<AddUserLandingResDto>> CheckIfCanBeSignedUp(string personalNumber);
+    Task<ServiceResponse<AddUserLandingNoCheckResDto>> AddUserLandingPage(AddUserLandingNoCheckDto landingUser);
+    Task<RegisterUserRes> RegisterSignicatUser();
 }

@@ -1,11 +1,8 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using ztlme.Dtos;
 using ztlme.Services;
-using ztlme.Models;
 
 namespace ztlme.Controllers;
 
@@ -42,11 +39,11 @@ public class AuthController : ControllerBase
     }
     
     // Do not use, expensive, requires bankid
-    [HttpGet("success")]
+    [HttpPost("success")]
     public async Task<ActionResult<string>> Get()
     {
         Console.WriteLine("success, redirecting");
-        var response = await _authService.AuthSuccessBankId();
+        var response = await _authService.RegisterCriiptoUserSuccess();
         if (response.Success)
         {
             if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
@@ -55,14 +52,14 @@ public class AuthController : ControllerBase
             }
             return Redirect(_configuration["Frontend:AuthSuccessURI"]!);
         }
-        return Ok(await _authService.AuthSuccessBankId());
+        return Ok(await _authService.RegisterCriiptoUserSuccess());
     }
 
     // If empty body, return false.
     // Before calling credit check API, check the DB
     // if (person in DB) -> If (CreditScoreOK) -> true else false
     [HttpPost("signup")]
-    public async Task<ActionResult<SignupUserResDto>> SignUp([FromBody] SignupUserReqDto req)
+    public async Task<ActionResult<AddUserLandingResDto>> SignUp([FromBody] AddUserLandingDto landing)
     {
         // Check for credit and is lower than we need, reject (return false).
         // If ok, add to the database
@@ -70,7 +67,7 @@ public class AuthController : ControllerBase
         try
         {
             _logger.LogInformation("Checking credit score...");
-            var response = await _authService.CheckIfCanBeSignedUp(req.PersonalNumber);
+            var response = await _authService.CheckIfCanBeSignedUp(landing.PersonalNumber);
             _logger.LogInformation("Credit check response: " + response);
             return Ok(response);
         }

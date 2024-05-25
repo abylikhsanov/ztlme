@@ -50,7 +50,7 @@ public class ZtlmeControllerTests
     public async Task SignupUserRequest_CreditScoreHigh()
     {
         CreateDbScope();
-        SignupUserReqDto request = new SignupUserReqDto
+        AddUserLandingDto request = new AddUserLandingDto
         {
             PersonalNumber = "30070721151"
         };
@@ -66,7 +66,7 @@ public class ZtlmeControllerTests
             throw new HttpRequestException($"Response status code does not indicate success: {response.StatusCode} ({response.ReasonPhrase}). Server response: {errorContent}");
         }
         response.EnsureSuccessStatusCode();
-        var signupUserResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<SignupUserResDto>>();
+        var signupUserResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<AddUserLandingResDto>>();
         signupUserResponse?.Data?.CanBeSignedUp.Should().BeTrue();
         signupUserResponse?.Data?.DocumentSigned.Should().BeFalse();
     }
@@ -75,7 +75,7 @@ public class ZtlmeControllerTests
     public async Task SignupUserRequest_CreditScoreLow()
     {
         CreateDbScope();
-        SignupUserReqDto request = new SignupUserReqDto
+        AddUserLandingDto request = new AddUserLandingDto
         {
             PersonalNumber = "12345678912"
         };
@@ -92,7 +92,7 @@ public class ZtlmeControllerTests
             throw new HttpRequestException($"Response status code does not indicate success: {response.StatusCode} ({response.ReasonPhrase}). Server response: {errorContent}");
         }
         response.EnsureSuccessStatusCode();
-        var signupUserResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<SignupUserResDto>>();
+        var signupUserResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<AddUserLandingResDto>>();
         signupUserResponse?.Data?.CanBeSignedUp.Should().BeFalse();
         signupUserResponse?.Data?.DocumentSigned.Should().BeFalse();
     }
@@ -112,7 +112,7 @@ public class ZtlmeControllerTests
             });
             await db.SaveChangesAsync();
         }
-        SignupUserReqDto request = new SignupUserReqDto
+        AddUserLandingDto request = new AddUserLandingDto
         {
             PersonalNumber = "12345678912"
         };
@@ -129,7 +129,7 @@ public class ZtlmeControllerTests
             throw new HttpRequestException($"Response status code does not indicate success: {response.StatusCode} ({response.ReasonPhrase}). Server response: {errorContent}");
         }
         response.EnsureSuccessStatusCode();
-        var signupUserResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<SignupUserResDto>>();
+        var signupUserResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<AddUserLandingResDto>>();
         signupUserResponse?.Data?.CanBeSignedUp.Should().BeFalse();
         signupUserResponse?.Data?.DocumentSigned.Should().BeFalse();
         signupUserResponse?.Data?.CreditScoreApiCalled?.Should().BeFalse();
@@ -151,7 +151,7 @@ public class ZtlmeControllerTests
             });
             await db.SaveChangesAsync();
         }
-        SignupUserReqDto request = new SignupUserReqDto
+        AddUserLandingDto request = new AddUserLandingDto
         {
             PersonalNumber = "30070721151"
         };
@@ -168,7 +168,7 @@ public class ZtlmeControllerTests
             throw new HttpRequestException($"Response status code does not indicate success: {response.StatusCode} ({response.ReasonPhrase}). Server response: {errorContent}");
         }
         response.EnsureSuccessStatusCode();
-        var signupUserResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<SignupUserResDto>>();
+        var signupUserResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<AddUserLandingResDto>>();
         signupUserResponse?.Data?.CanBeSignedUp.Should().BeTrue();
         signupUserResponse?.Data?.DocumentSigned.Should().BeTrue();
         signupUserResponse?.Data?.CreditScoreApiCalled?.Should().BeFalse();

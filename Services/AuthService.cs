@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ztlme.Data;
@@ -47,10 +46,9 @@ public class AuthService : IAuthService
         return response;
     }
     
-    public async Task<ServiceResponse<string>> AuthSuccessBankId()
+    public async Task<ServiceResponse<string>> RegisterCriiptoUserSuccess()
     {
         var response = new ServiceResponse<string>();
-
         try
         {
             var user = _httpContextAccessor.HttpContext?.User;
@@ -91,18 +89,16 @@ public class AuthService : IAuthService
         return response;
     }
 
-    public async Task<ServiceResponse<SignupUserResDto>> CheckIfCanBeSignedUp(string personalNumber)
+    public async Task<ServiceResponse<AddUserLandingResDto>> CheckIfCanBeSignedUp(string personalNumber)
     {
-        _logger.LogInformation("Je");
-        var response = new ServiceResponse<SignupUserResDto>();
-        var personSignUp = new SignupUserResDto();
+        var response = new ServiceResponse<AddUserLandingResDto>();
         response.Success = true;
-        response.Data = personSignUp;
         
         // Before checking credit score (it costs money, check if we have the person in the database
         var userDb = await _dataContext.Users.FirstOrDefaultAsync(user => user.UserName == personalNumber);
         if (userDb != null)
         {
+            response.Data = userDb.ToAddUserLandingResDto();
             response.Data.CreditScoreApiCalled = false;
             if (!userDb.CreditScoreOk)
             {
@@ -124,8 +120,10 @@ public class AuthService : IAuthService
         // Perform credit score, new user.
         var newUser = new User
         {
-            UserName = personalNumber
+            UserName = personalNumber,
+            CreditScoreOk = false
         };
+        response.Data = newUser.ToAddUserLandingResDto();
         
         // For testing purposes, suppose only this credit check is okay
         if (personalNumber == "30070721151")
@@ -137,6 +135,26 @@ public class AuthService : IAuthService
         _dataContext.Users.Add(newUser);
         await _dataContext.SaveChangesAsync();
         
+        return response;
+    }
+
+    public async Task<ServiceResponse<AddUserLandingNoCheckResDto>> AddUserLandingPage(AddUserLandingNoCheckDto landingUser)
+    {
+        var response = new ServiceResponse<AddUserLandingNoCheckResDto>();
+        response.Success = true;
+
+        var user = landingUser.FromAddUserLandingNoCheck();
+        _dataContext.Users.Add(user);
+        await _dataContext.SaveChangesAsync();
+
+        return response;
+    }
+
+    public async Task<RegisterUserRes> RegisterSignicatUser()
+    {
+        var response = new RegisterUserRes();
+
+
         return response;
     }
     
