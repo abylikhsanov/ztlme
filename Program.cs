@@ -187,12 +187,6 @@ builder.Services.AddSingleton<CriiptoSignaturesClient>(serviceProvider =>
 });
 
 // Register services
-Console.WriteLine($"ClientID: {builder.Configuration["SignicatAuth:ClientId"]}, Secret: {builder.Configuration["SignicatAuth:Secret"]}");
-builder.Services.AddSingleton<IAuthenticationService>(c => new AuthenticationService(
-    builder.Configuration["SignicatAuth:ClientId"],
-    builder.Configuration["SignicatAuth:Secret"],
-    new List<OAuthScope>() { OAuthScope.Identify }
-));
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ISignatureService, SignatureService>();
 
