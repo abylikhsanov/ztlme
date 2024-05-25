@@ -105,10 +105,18 @@ builder.Services.AddAuthentication(config =>
         config.Events.OnAuthorizationCodeReceived = RedeemAuthorizationCodeAsync;
 
         config.Authority = "https://ztlme.sandbox.signicat.com/auth/open";
-
-        config.ClientId = builder.Configuration["SignicatAuth:ClientId"];
-        config.ClientSecret = builder.Configuration["SignicatAuth:Secret"];
-
+        
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+        {
+            config.ClientId = Environment.GetEnvironmentVariable("SIGNICAT_AUTH_CLIENT_ID");
+            config.ClientSecret = Environment.GetEnvironmentVariable("SIGNICAT_AUTH_CLIENT_SECRET");
+        }
+        else
+        {
+            config.ClientId = builder.Configuration["SignicatAuth:ClientId"];
+            config.ClientSecret = builder.Configuration["SignicatAuth:Secret"];
+        }
+        
         config.CallbackPath = "/api/auth/success";
 
         config.UsePkce = true;
